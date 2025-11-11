@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="𓎩 - Recipe Details">
+    <title>𓎩 - Recipe Details</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap">
+</head>
+<body>
+    <header class="main-header">
+        <nav class="nav-container">
+            <a href="/" class="logo">𓎩</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="recipes.html">Recipes</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <button class="theme-switcher">☀︎</button>
+        </nav>
+    </header>
+
+    <main class="recipe-details-container">
+        <div class="recipe-content">
+            <div class="recipe-info">
+                <h1 id="recipe-name"></h1>
+                <p id="recipe-description"></p>
+                
+                <h3>Ingredients</h3>
+                <ul id="recipe-ingredients"></ul>
+                
+                <h3>Steps</h3>
+                <ol id="recipe-steps"></ol>
+            </div>
+            <div class="recipe-image-box">
+                <img id="recipe-image" src="" alt="">
+                <div class="next-arrow-container">
+                    <button class="arrow-btn" id="prev-recipe">←</button>
+                    <button class="arrow-btn" id="next-recipe">→</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2025 𓎩. Made with love for food lovers.</p>
+        </div>
+    </footer>
+
+    <script src="js/recipes.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        let currentRecipeId;
+        let isAnimating = false;
+
+        // Function to get recipe ID from URL
+        function getRecipeIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return parseInt(urlParams.get('id'));
+        }
+
+        // Function to find recipe by ID
+        function findRecipeById(id) {
+            return recipes.find(r => r.id === id);
+        }
+
+        // Function to load recipe details with smooth transitions
+        async function loadRecipeDetails(recipe, animate = false) {
+            if (!recipe || isAnimating) return;
+            
+            isAnimating = animate;
+            const recipeInfo = document.querySelector('.recipe-info');
+            const recipeImage = document.getElementById('recipe-image');
+
+            // Preload the new image
+            const imageLoaded = new Promise((resolve) => {
+                const newImage = new Image();
+                newImage.onload = resolve;
+                newImage.src = recipe.image;
+            });
+
+            if (animate) {
+                // Fade out current image completely
+                recipeImage.style.opacity = '0';
+                // Wait for fade out to complete
+                await new Promise(resolve => setTimeout(resolve, 400));
+            }
+
+            // Immediately update text content without animation
+            document.title = `𓎩 - ${recipe.name}`;
+            document.getElementById('recipe-name').textContent = recipe.name;
+            document.getElementById('recipe-description').textContent = recipe.description;
+
+            // Update lists immediately
+            const ingredientsList = document.getElementById('recipe-ingredients');
+            const stepsList = document.getElementById('recipe-steps');
+            
+            ingredientsList.innerHTML = recipe.ingredients
+                .map(ingredient => `<li>${ingredient}</li>`)
+                .join('');
+            
+            stepsList.innerHTML = recipe.steps
+                .map(step => `<li>${step}</li>`)
+                .join('');
+
+            // Wait for new image to load while previous one is faded out
+            await imageLoaded;
+            
+            // Update image source while it's invisible
+            recipeImage.src = recipe.image;
+            recipeImage.alt = recipe.name;
+
+            if (animate) {
+                // Small delay to ensure new image is ready
+                await new Promise(resolve => setTimeout(resolve, 50));
+                // Fade in new image
+                recipeImage.style.opacity = '1';
+                // Wait for fade in to complete
+                await new Promise(resolve => setTimeout(resolve, 400));
+            }
+
+            isAnimating = false;
+            currentRecipeId = recipe.id;
+        }
+
+        // Initialize the page
+        function initializePage() {
+            currentRecipeId = getRecipeIdFromUrl();
+            const recipe = findRecipeById(currentRecipeId);
+            
+            if (!recipe) {
+                window.location.href = 'recipes.html';
+                return;
+            }
+            
+            loadRecipeDetails(recipe);
+        }
+
+        // Handle next recipe navigation
+        document.getElementById('next-recipe').addEventListener('click', async () => {
+            if (isAnimating) return;
+            
+            const currentIndex = recipes.findIndex(r => r.id === currentRecipeId);
+            const nextIndex = (currentIndex + 1) % recipes.length;
+            const nextRecipe = recipes[nextIndex];
+            
+            // Update URL without refreshing the page
+            window.history.pushState({}, '', `recipedetails.html?id=${nextRecipe.id}`);
+            await loadRecipeDetails(nextRecipe, true);
+        });
+
+        // Handle previous recipe navigation
+        document.getElementById('prev-recipe').addEventListener('click', async () => {
+            if (isAnimating) return;
+            
+            const currentIndex = recipes.findIndex(r => r.id === currentRecipeId);
+            const prevIndex = (currentIndex - 1 + recipes.length) % recipes.length;
+            const prevRecipe = recipes[prevIndex];
+            
+            // Update URL without refreshing the page
+            window.history.pushState({}, '', `recipedetails.html?id=${prevRecipe.id}`);
+            await loadRecipeDetails(prevRecipe, true);
+        });
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', () => {
+            const newRecipeId = getRecipeIdFromUrl();
+            const recipe = findRecipeById(newRecipeId);
+            loadRecipeDetails(recipe, true);
+        });
+
+        // Initialize the page
+        initializePage();
+    </script>
+</body>
+</html>

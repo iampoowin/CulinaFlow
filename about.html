@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="About 𓎩 - Our story and mission">
+    <title>About — 𓎩</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap">
+</head>
+<body>
+    <header class="main-header">
+        <nav class="nav-container">
+            <a href="/" class="logo">𓎩</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="recipes.html">Recipes</a></li>
+                <li><a href="about.html" class="active">About</a></li>
+            </ul>
+            <button class="theme-switcher">☀︎</button>
+        </nav>
+    </header>
+
+    <main class="about-page">
+        <section class="about-content">
+            <div class="container">
+                <h1>CulinaFlow</h1>
+                <p class="subtitle">Where Culinary Art Meets Digital Flow</p>
+                
+                <div class="about-sections">
+                    <div class="about-nav">
+                        <ul>
+                            <li><a href="#vision">Vision</a></li>
+                            <li><a href="#design">Design Philosophy</a></li>
+                            <li><a href="#features">Key Features</a></li>
+                            <li><a href="#technology">Technology</a></li>
+                            <li><a href="#future">Future Vision</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="about-text">
+                        <div id="vision">
+                            <h2>Vision</h2>
+                            <p>CulinaFlow emerged from a vision to transform the way we interact with recipes online. In a digital world often cluttered with advertisements and unnecessary complexity, we chose to create a space where the focus remains purely on the art of cooking. Our platform demonstrates that functional beauty in web design can enhance the cooking experience, making it more intuitive and enjoyable.</p>
+                        </div>
+
+                        <div id="design">
+                            <h2>Design Philosophy</h2>
+                            <p>At the heart of CulinaFlow lies our commitment to minimalist design principles. We believe that true elegance comes from simplicity and purpose. Each element on our platform serves a specific function, creating an environment where recipes take center stage. The clean layout, thoughtful typography, and subtle animations work in harmony to guide users through their culinary journey without distraction.</p>
+                            <p>Our color palette draws inspiration from natural ingredients and modern design sensibilities, while our responsive layout ensures a seamless experience across all devices. The integration of light and dark modes reflects our understanding of different cooking environments and user preferences.</p>
+                        </div>
+
+                        <div id="features">
+                            <h2>Key Features</h2>
+                            <p>CulinaFlow showcases several innovative features that enhance the recipe browsing experience. The fluid transitions between recipes create a natural flow, while our unique layout presents ingredients and instructions in an easily digestible format. The image-forward design celebrates the visual appeal of cuisine, with high-quality photographs that inspire and guide.</p>
+                            <p>Our navigation system, with its intuitive arrows and smooth scrolling, demonstrates how thoughtful interaction design can make recipe exploration more engaging. The responsive grid layout adapts seamlessly to different screen sizes, ensuring that the beauty of our design remains consistent across all devices.</p>
+                        </div>
+
+                        <div id="technology">
+                            <h2>Technology</h2>
+                            <p>CulinaFlow is built entirely with frontend technologies, proving that sophisticated user experiences don't require complex backend systems. Through careful implementation of HTML5, CSS3, and vanilla JavaScript, we've created a platform that performs smoothly and loads instantly. Our code architecture emphasizes maintainability and scalability, with clean, modular components that can evolve with future needs.</p>
+                            <p>The absence of a backend is not a limitation but a deliberate choice, showcasing how modern frontend technologies can create rich, interactive experiences. Our use of CSS Grid and Flexbox demonstrates modern layout techniques, while our JavaScript implementations handle state management and animations with minimal overhead.</p>
+                        </div>
+
+                        <div id="future">
+                            <h2>Future Vision</h2>
+                            <p>While CulinaFlow currently exists as a frontend showcase, its design and architecture lay the groundwork for future expansions. We envision integrating community features, personalized recipe collections, and advanced search capabilities, all while maintaining our commitment to simplicity and visual elegance.</p>
+                            <p>The project stands as a testament to the power of focused design and efficient frontend development, proving that beautiful, functional web applications don't need to be complex to be impactful.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="recipes.html" class="cta-button">Explore Our Recipes</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>© 2025 𓎩 | Crafted with ❤</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.about-nav a');
+            const sections = document.querySelectorAll('.about-text div[id]');
+            
+            // Function to calculate the offset position
+            function getScrollPosition(element) {
+                const visionLink = document.querySelector('.about-nav a[href="#vision"]');
+                const rect = element.getBoundingClientRect();
+                const visionRect = visionLink.getBoundingClientRect();
+                const headerOffset = 50; // Height of the main header
+                
+                // Calculate position that aligns the heading with the Vision button
+                const absoluteTop = window.pageYOffset + rect.top;
+                const targetPosition = absoluteTop - (visionRect.top - headerOffset);
+                
+                return targetPosition;
+            }
+
+            // Handle click on nav links
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').slice(1);
+                    const targetSection = document.getElementById(targetId);
+                    
+                    // Calculate the position where heading aligns with Vision button
+                    const scrollPosition = getScrollPosition(targetSection);
+                    
+                    // Smooth scroll to calculated position
+                    window.scrollTo({
+                        top: scrollPosition,
+                        behavior: 'smooth'
+                    });
+
+                    // Update active state
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+
+            // Handle scroll to update active nav item
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        // Find the corresponding nav link
+                        const activeLink = Array.from(navLinks).find(
+                            link => link.getAttribute('href') === `#${id}`
+                        );
+                        
+                        if (activeLink) {
+                            navLinks.forEach(link => link.classList.remove('active'));
+                            activeLink.classList.add('active');
+                        }
+                    }
+                });
+            }, {
+                rootMargin: '0px',
+                threshold: [0.1, 0.5]
+            });
+
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+</body>
+</html>
